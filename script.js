@@ -188,8 +188,11 @@ function drawCross({ activist, reflector, theorist, pragmatist }) {
   while (svg.firstChild) svg.removeChild(svg.firstChild);
 
   const W = 520, H = 520;
+
+  // Increased padding so labels never get clipped inside the SVG bounds
+  const pad = 120;
+
   const cx = W / 2, cy = H / 2;
-  const pad = 60;
   const left = pad, right = W - pad, top = pad, bottom = H - pad;
 
   svg.appendChild(svgRect(0, 0, W, H, { fill: "#0f1118" }));
@@ -201,11 +204,17 @@ function drawCross({ activist, reflector, theorist, pragmatist }) {
   // Centre dot
   svg.appendChild(svgCircle(cx, cy, 5, { fill: "#7aa2ff" }));
 
+  // Label positions (kept safely inside the viewBox)
+  const topLabelY = top - 18;           // stays >= 0 due to larger pad
+  const bottomLabelY = bottom + 18;     // stays <= H due to larger pad
+  const leftLabelX = pad - 20;          // enough space for "Reflector" with anchor="end"
+  const rightLabelX = W - pad + 20;     // enough space for "Pragmatist" with anchor="start"
+
   // Labels + scores
-  svg.appendChild(labelBlock(cx, top - 18, "Activist", activist, "middle"));
-  svg.appendChild(labelBlock(cx, bottom + 18, "Theorist", theorist, "middle"));
-  svg.appendChild(labelBlock(left - 10, cy, "Reflector", reflector, "end"));
-  svg.appendChild(labelBlock(right + 10, cy, "Pragmatist", pragmatist, "start"));
+  svg.appendChild(labelBlock(cx, topLabelY, "Activist", activist, "middle"));
+  svg.appendChild(labelBlock(cx, bottomLabelY, "Theorist", theorist, "middle"));
+  svg.appendChild(labelBlock(leftLabelX, cy, "Reflector", reflector, "end"));
+  svg.appendChild(labelBlock(rightLabelX, cy, "Pragmatist", pragmatist, "start"));
 
   // Tick marks (0..20) on each arm
   const ticks = 20;
@@ -225,6 +234,7 @@ function drawCross({ activist, reflector, theorist, pragmatist }) {
     svg.appendChild(svgLine(xRight, cy - 7, xRight, cy + 7, { stroke: "#1d2030", "stroke-width": 2 }));
   }
 }
+
 
 // --- SVG helpers ---
 function svgEl(name, attrs = {}) {
