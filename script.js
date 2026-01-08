@@ -108,7 +108,7 @@ function makeQuestionRow(q) {
 }
 
 async function loadQuestions() {
-  const res = await fetch("questions.json", { cache: "no-store" });
+  const res = await fetch("./questions.json", { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load questions.json (${res.status})`);
   const data = await res.json();
 
