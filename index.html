@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Learning Styles Questionnaire (Honey & Mumford) – Scoring Tool</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="container">
+    <h1>Learning Styles Questionnaire</h1>
+    <p class="subtle">
+      Tick the statements that feel true for you. Your scores will update automatically.
+    </p>
+
+    <div class="card name-card">
+      <label for="name-input" class="label">Your Name</label>
+      <input id="name-input" class="text-input" type="text" placeholder="e.g., Somdip Dey" autocomplete="name" />
+      <p class="subtle small">
+        Your name is saved on this device only (localStorage). It is used for on-screen results and downloads.
+      </p>
+    </div>
+
+    <div class="notice" role="note" aria-label="Copyright note">
+      <strong>Note:</strong> Ensure you have the rights/licence to publish Honey &amp; Mumford questionnaire wording.
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="grid">
+      <div class="card" id="results-card">
+        <div class="results-header">
+          <div>
+            <h2>Scores</h2>
+            <p class="subtle small" id="result-title">Results</p>
+          </div>
+          <div class="results-actions">
+            <button id="btn-download" type="button">Download outcome (PNG)</button>
+          </div>
+        </div>
+
+        <div class="scores" aria-live="polite">
+          <div class="score-row"><span>Activist</span><strong id="s-activist">0</strong></div>
+          <div class="score-row"><span>Reflector</span><strong id="s-reflector">0</strong></div>
+          <div class="score-row"><span>Theorist</span><strong id="s-theorist">0</strong></div>
+          <div class="score-row"><span>Pragmatist</span><strong id="s-pragmatist">0</strong></div>
+        </div>
+
+        <div class="meta">
+          <div><span>Ticked</span><strong id="s-ticked">0</strong></div>
+          <div><span>Total items</span><strong id="s-total">80</strong></div>
+        </div>
+
+        <p class="subtle small" id="download-status" aria-live="polite"></p>
+      </div>
+
+      <div class="card" id="cross-card">
+        <h2>Honey &amp; Mumford Cross</h2>
+        <p class="subtle">
+          Totals on each arm: Activist (top), Theorist (bottom), Reflector (left), Pragmatist (right).
+        </p>
+
+        <div class="cross-wrap">
+          <svg id="cross" viewBox="0 0 520 520" role="img" aria-label="Learning styles cross">
+            <!-- drawn by JS -->
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <h2>Questionnaire</h2>
+        <div class="toolbar-actions">
+          <button id="btn-check-all" type="button">Tick all</button>
+          <button id="btn-uncheck-all" type="button">Untick all</button>
+          <button id="btn-random" type="button">Random demo</button>
+        </div>
+      </div>
+
+      <div id="question-list" class="question-list" aria-label="Question list">
+        <div class="loading">Loading questions…</div>
+      </div>
+    </section>
+
+    <footer class="container footer">
+      <p class="subtle">
+        Built as a static page for GitHub Pages. No data is sent anywhere; everything runs in your browser.
+      </p>
+      <ul class="subtle">
+        <li>Honey &amp; Mumford Questions are copyrighted by Honey &amp; Mumford</li>
+        <li>Code copyrighted by Dr Somdip Dey, Regent European University</li>
+      </ul>
+    </footer>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
