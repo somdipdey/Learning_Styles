@@ -11,7 +11,7 @@
   <header class="container">
     <h1>Learning Styles Questionnaire</h1>
     <p class="subtle">
-      Tick the statements that feel true for you. Your scores will update automatically.
+      This tool helps you identify your preferred learning style(s) using the Honey &amp; Mumford Learning Styles Questionnaire.
     </p>
 
     <div class="card name-card">
@@ -22,17 +22,50 @@
       </p>
     </div>
 
+    <div class="notice instructions" role="note" aria-label="How to complete the questionnaire">
+      <h2 class="notice-title">How to complete this questionnaire</h2>
+      <ul>
+        <li>There is <strong>no time limit</strong> (it typically takes around <strong>10–15 minutes</strong>).</li>
+        <li>Be as <strong>honest</strong> as you can — there are <strong>no right or wrong</strong> answers.</li>
+        <li>For each statement, tick it if you <strong>agree more than you disagree</strong>.</li>
+        <li>If you <strong>disagree more than you agree</strong>, leave it unticked.</li>
+        <li>Your scores update automatically. When you’re done, scroll to the <strong>Results</strong> section.</li>
+      </ul>
+    </div>
+
     <div class="notice" role="note" aria-label="Copyright note">
       <strong>Note:</strong> All rights of Honey &amp; Mumford questionnaire are reserved by Honey &amp; Mumford.
     </div>
   </header>
 
   <main class="container">
-    <section class="grid">
+    <!-- 1) Questionnaire first -->
+    <section class="card" id="questionnaire">
+      <div class="toolbar">
+        <div>
+          <h2>Questionnaire</h2>
+          <p class="subtle small">Tick the statements that feel true for you.</p>
+        </div>
+
+        <div class="toolbar-actions">
+          <button id="btn-check-all" type="button">Tick all</button>
+          <button id="btn-uncheck-all" type="button">Untick all</button>
+          <button id="btn-random" type="button">Random demo</button>
+          <button id="btn-to-results" type="button" class="primary">Go to results</button>
+        </div>
+      </div>
+
+      <div id="question-list" class="question-list" aria-label="Question list">
+        <div class="loading">Loading questions…</div>
+      </div>
+    </section>
+
+    <!-- 2) Results after the test -->
+    <section class="grid results-section" id="results">
       <div class="card" id="results-card">
         <div class="results-header">
           <div>
-            <h2>Scores</h2>
+            <h2>Results</h2>
             <p class="subtle small" id="result-title">Results</p>
           </div>
           <div class="results-actions">
@@ -69,18 +102,57 @@
       </div>
     </section>
 
-    <section class="card">
-      <div class="toolbar">
-        <h2>Questionnaire</h2>
-        <div class="toolbar-actions">
-          <button id="btn-check-all" type="button">Tick all</button>
-          <button id="btn-uncheck-all" type="button">Untick all</button>
-          <button id="btn-random" type="button">Random demo</button>
-        </div>
-      </div>
+    <!-- 3) Short profile descriptions as dropdowns -->
+    <section class="card" id="profiles">
+      <h2>What do these styles mean?</h2>
+      <p class="subtle">
+        These are short summaries of the learning styles described by Honey &amp; Mumford.
+      </p>
 
-      <div id="question-list" class="question-list" aria-label="Question list">
-        <div class="loading">Loading questions…</div>
+      <div class="profiles">
+        <details class="profile">
+          <summary><strong>Activist</strong> – learns by doing</summary>
+          <div class="profile-body">
+            <p>
+              Activists involve themselves fully in new experiences. They enjoy the “here and now”, like variety,
+              and often prefer to try things first and consider consequences later. They tend to thrive on new challenges
+              but may get bored with longer implementation and consolidation.
+            </p>
+          </div>
+        </details>
+
+        <details class="profile">
+          <summary><strong>Reflector</strong> – learns by observing and thinking</summary>
+          <div class="profile-body">
+            <p>
+              Reflectors prefer to stand back, observe, and think things through from multiple angles.
+              They like collecting information, listening to others, and taking time before reaching conclusions.
+              They may dislike being rushed or pushed into the spotlight.
+            </p>
+          </div>
+        </details>
+
+        <details class="profile">
+          <summary><strong>Theorist</strong> – learns by understanding models and logic</summary>
+          <div class="profile-body">
+            <p>
+              Theorists integrate observations into coherent, logical frameworks. They like structure, concepts,
+              models, and clear reasoning. They prefer objective analysis and may feel uncomfortable with ambiguity,
+              subjective topics, or approaches that don’t “make sense”.
+            </p>
+          </div>
+        </details>
+
+        <details class="profile">
+          <summary><strong>Pragmatist</strong> – learns by applying ideas in practice</summary>
+          <div class="profile-body">
+            <p>
+              Pragmatists are keen to try out ideas and techniques to see if they work in real situations.
+              They prefer practical tips, action plans, and immediate relevance. They may become impatient with long,
+              open-ended discussion if it doesn’t lead to action.
+            </p>
+          </div>
+        </details>
       </div>
     </section>
 

@@ -1,9 +1,8 @@
 /**
  * Honey & Mumford LSQ scoring (80 items; 4 styles; 20 items per style).
- * Scoring keys updated to exactly match the scoring table shown in the attached document. :contentReference[oaicite:1]{index=1}
+ * Scoring keys match the scoring table shown in the attached document. :contentReference[oaicite:2]{index=2}
  */
 
-// EXACTLY as per the scoring table in the document:
 // Column 1 = Activist, Column 2 = Reflector, Column 3 = Theorist, Column 4 = Pragmatist
 const STYLE_KEYS = {
   activist:   [2, 4, 6, 10, 17, 23, 24, 32, 34, 38, 40, 43, 45, 48, 58, 64, 71, 72, 74, 79],
@@ -27,6 +26,7 @@ const els = {
   btnCheckAll: document.getElementById("btn-check-all"),
   btnUncheckAll: document.getElementById("btn-uncheck-all"),
   btnRandom: document.getElementById("btn-random"),
+  btnToResults: document.getElementById("btn-to-results"),
   nameInput: document.getElementById("name-input"),
   resultTitle: document.getElementById("result-title"),
   btnDownload: document.getElementById("btn-download"),
@@ -121,7 +121,6 @@ async function loadQuestions() {
     .filter((q) => Number.isFinite(q.id) && q.id >= 1 && q.id <= 80)
     .sort((a, b) => a.id - b.id);
 
-  // Ensure answers map has all keys
   for (const q of QUESTIONS) {
     if (answers[q.id] === undefined) answers[q.id] = false;
   }
@@ -175,14 +174,13 @@ function setAll(val) {
 }
 
 function randomDemo() {
-  // Randomly tick about 40% for demo purposes
   for (const q of QUESTIONS) answers[q.id] = Math.random() < 0.4;
   persistAnswers();
   renderQuestions();
   computeScores();
 }
 
-// --- SVG cross drawing ---
+// --- SVG cross drawing (labels never clipped) ---
 function drawCross({ activist, reflector, theorist, pragmatist }) {
   const svg = els.cross;
   while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -190,11 +188,11 @@ function drawCross({ activist, reflector, theorist, pragmatist }) {
   const W = 520, H = 520;
   const cx = W / 2, cy = H / 2;
 
-  // Axis padding (how far in the cross ends from the edges)
+  // Keep cross arms away from edges, while labels are pinned safely inside edges.
   const axisPad = 110;
   const left = axisPad, right = W - axisPad, top = axisPad, bottom = H - axisPad;
 
-  // Safe label margin from SVG edges (prevents any cropping)
+  // Safe margins for labels inside the SVG
   const m = 24;
 
   svg.appendChild(svgRect(0, 0, W, H, { fill: "#0f1118" }));
@@ -206,27 +204,23 @@ function drawCross({ activist, reflector, theorist, pragmatist }) {
   // Centre dot
   svg.appendChild(svgCircle(cx, cy, 5, { fill: "#7aa2ff" }));
 
-  // Labels + scores: positioned INSIDE the viewBox with safe margins
-  // Top and bottom
+  // Labels + scores (anchors point inward so text never crosses SVG bounds)
   svg.appendChild(labelBlock(cx, m + 10, "Activist", activist, "middle"));
   svg.appendChild(labelBlock(cx, H - (m + 32), "Theorist", theorist, "middle"));
 
-  // Left and right (key fix: anchors point INWARD)
   svg.appendChild(labelBlock(m, cy, "Reflector", reflector, "start"));
   svg.appendChild(labelBlock(W - m, cy, "Pragmatist", pragmatist, "end"));
 
-  // Tick marks (0..20) along each arm
+  // Tick marks (0..20)
   const ticks = 20;
   for (let i = 1; i < ticks; i++) {
     const t = i / ticks;
 
-    // vertical ticks along y-axis
     const yUp = cy - (cy - top) * t;
     const yDown = cy + (bottom - cy) * t;
     svg.appendChild(svgLine(cx - 7, yUp, cx + 7, yUp, { stroke: "#1d2030", "stroke-width": 2 }));
     svg.appendChild(svgLine(cx - 7, yDown, cx + 7, yDown, { stroke: "#1d2030", "stroke-width": 2 }));
 
-    // horizontal ticks along x-axis
     const xLeft = cx - (cx - left) * t;
     const xRight = cx + (right - cx) * t;
     svg.appendChild(svgLine(xLeft, cy - 7, xLeft, cy + 7, { stroke: "#1d2030", "stroke-width": 2 }));
@@ -234,22 +228,15 @@ function drawCross({ activist, reflector, theorist, pragmatist }) {
   }
 }
 
-
 // --- SVG helpers ---
 function svgEl(name, attrs = {}) {
   const el = document.createElementNS("http://www.w3.org/2000/svg", name);
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
   return el;
 }
-function svgLine(x1, y1, x2, y2, attrs = {}) {
-  return svgEl("line", { x1, y1, x2, y2, ...attrs });
-}
-function svgRect(x, y, w, h, attrs = {}) {
-  return svgEl("rect", { x, y, width: w, height: h, ...attrs });
-}
-function svgCircle(cx, cy, r, attrs = {}) {
-  return svgEl("circle", { cx, cy, r, ...attrs });
-}
+function svgLine(x1, y1, x2, y2, attrs = {}) { return svgEl("line", { x1, y1, x2, y2, ...attrs }); }
+function svgRect(x, y, w, h, attrs = {}) { return svgEl("rect", { x, y, width: w, height: h, ...attrs }); }
+function svgCircle(cx, cy, r, attrs = {}) { return svgEl("circle", { cx, cy, r, ...attrs }); }
 function svgText(x, y, text, attrs = {}) {
   const t = svgEl("text", { x, y, ...attrs });
   t.textContent = text;
@@ -279,14 +266,11 @@ async function downloadOutcomePng() {
 
   els.downloadStatus.textContent = "Preparing download…";
 
-  // Convert SVG to image
   const svgDataUrl = svgToDataUrl(els.cross);
   const crossImg = await loadImage(svgDataUrl);
 
-  // Canvas export
-  // Layout: title + name + date + scores + cross
-  const scale = 2;                 // higher = sharper
-  const W = 1100, H = 800;         // logical pixels
+  const scale = 2;
+  const W = 1100, H = 800;
   const canvas = document.createElement("canvas");
   canvas.width = W * scale;
   canvas.height = H * scale;
@@ -295,21 +279,17 @@ async function downloadOutcomePng() {
 
   ctx.scale(scale, scale);
 
-  // Background
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, W, H);
 
-  // Title
   ctx.fillStyle = "#111827";
   ctx.font = "700 28px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
   ctx.fillText("Learning Styles Outcome (Honey & Mumford)", 40, 60);
 
-  // Name + date
   ctx.font = "500 18px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
   ctx.fillText(`Name: ${name}`, 40, 95);
   ctx.fillText(`Generated: ${dateStr}`, 40, 120);
 
-  // Scores box
   const boxX = 40, boxY = 150, boxW = 420, boxH = 240;
   ctx.strokeStyle = "#d1d5db";
   ctx.lineWidth = 2;
@@ -338,23 +318,20 @@ async function downloadOutcomePng() {
   ctx.fillStyle = "#6b7280";
   ctx.fillText("Cross: Activist (top), Theorist (bottom), Reflector (left), Pragmatist (right).", boxX + 16, boxY + boxH - 16);
 
-  // Cross image
   const crossX = 520, crossY = 150;
   const crossW = 520, crossH = 520;
+
   ctx.fillStyle = "#111827";
   ctx.font = "700 20px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
   ctx.fillText("Honey & Mumford Cross", crossX, crossY - 14);
 
-  // Draw cross SVG as image
   ctx.drawImage(crossImg, crossX, crossY, crossW, crossH);
 
-  // Footer notes
   ctx.fillStyle = "#6b7280";
   ctx.font = "400 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
   ctx.fillText("Honey & Mumford Questions are copyrighted by Honey & Mumford.", 40, H - 40);
   ctx.fillText("Code copyrighted by Dr Somdip Dey, Regent European University.", 40, H - 22);
 
-  // Download
   const safeName = name.replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "_") || "Anonymous";
   const filename = `Learning_Styles_Outcome_${safeName}.png`;
 
@@ -375,14 +352,9 @@ async function downloadOutcomePng() {
 
 function svgToDataUrl(svgElement) {
   const clone = svgElement.cloneNode(true);
-
-  // Ensure xmlns exists
   if (!clone.getAttribute("xmlns")) clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-
   const svgText = new XMLSerializer().serializeToString(clone);
-  const encoded = encodeURIComponent(svgText)
-    .replace(/'/g, "%27")
-    .replace(/"/g, "%22");
+  const encoded = encodeURIComponent(svgText).replace(/'/g, "%27").replace(/"/g, "%22");
   return `data:image/svg+xml;charset=utf-8,${encoded}`;
 }
 
@@ -417,6 +389,10 @@ function loadImage(src) {
   els.btnCheckAll.addEventListener("click", () => setAll(true));
   els.btnUncheckAll.addEventListener("click", () => setAll(false));
   els.btnRandom.addEventListener("click", () => randomDemo());
+
+  els.btnToResults?.addEventListener("click", () => {
+    document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   els.btnDownload.addEventListener("click", async () => {
     els.downloadStatus.textContent = "";

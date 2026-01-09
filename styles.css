@@ -28,25 +28,6 @@ h2 { margin: 0 0 12px; }
 .subtle { color: var(--muted); margin: 0 0 10px; }
 .small { font-size: 0.92rem; }
 
-.notice {
-  margin-top: 12px;
-  padding: 12px 14px;
-  background: rgba(122, 162, 255, 0.10);
-  border: 1px solid rgba(122, 162, 255, 0.30);
-  border-radius: 10px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  margin: 16px 0;
-}
-
-@media (min-width: 860px) {
-  .grid { grid-template-columns: 1fr 1fr; }
-}
-
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -72,9 +53,46 @@ h2 { margin: 0 0 12px; }
   outline: none;
 }
 
-.text-input:focus {
-  border-color: rgba(122,162,255,0.6);
+.text-input:focus { border-color: rgba(122,162,255,0.6); }
+
+.notice {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: rgba(122, 162, 255, 0.10);
+  border: 1px solid rgba(122, 162, 255, 0.30);
+  border-radius: 10px;
 }
+
+.instructions {
+  background: rgba(122, 162, 255, 0.14);
+  border-color: rgba(122, 162, 255, 0.45);
+}
+
+.notice-title {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.notice ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text);
+}
+
+.notice li { margin: 6px 0; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+@media (min-width: 860px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+
+.results-section { scroll-margin-top: 16px; }
 
 .scores {
   display: grid;
@@ -150,6 +168,10 @@ button {
 button:hover { border-color: rgba(122,162,255,0.6); }
 button:active { transform: translateY(1px); }
 
+button.primary {
+  border-color: rgba(122,162,255,0.55);
+}
+
 .question-list {
   display: grid;
   gap: 8px;
@@ -186,5 +208,38 @@ button:active { transform: translateY(1px); }
 }
 
 .results-actions { display: flex; gap: 8px; }
+
+.profiles {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.profile {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #0f1118;
+}
+
+.profile summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.profile summary::-webkit-details-marker { display: none; }
+
+.profile summary::after {
+  content: "▾";
+  float: right;
+  color: var(--muted);
+}
+
+.profile[open] summary::after { content: "▴"; }
+
+.profile-body {
+  margin-top: 10px;
+  color: var(--text);
+}
 
 .footer { padding-top: 8px; }
