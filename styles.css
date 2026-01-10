@@ -243,3 +243,26 @@ button.primary {
 }
 
 .footer { padding-top: 8px; }
+
+/* --- Copilot action buttons --- */
+.copilot-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 999px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:hover {
+  border-color: rgba(122,162,255,0.6);
+}

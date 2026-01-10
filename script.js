@@ -1,6 +1,6 @@
 /**
  * Honey & Mumford LSQ scoring (80 items; 4 styles; 20 items per style).
- * Scoring keys match the scoring table shown in the attached document. :contentReference[oaicite:2]{index=2}
+ * Scoring keys match the scoring table shown in the Honey & Mumford questionnaire document.
  */
 
 // Column 1 = Activist, Column 2 = Reflector, Column 3 = Theorist, Column 4 = Pragmatist
@@ -31,12 +31,15 @@ const els = {
   resultTitle: document.getElementById("result-title"),
   btnDownload: document.getElementById("btn-download"),
   downloadStatus: document.getElementById("download-status"),
+  btnCopilot: document.getElementById("btn-copilot"),
+  copilotStatus: document.getElementById("copilot-status"),
 };
 
 let QUESTIONS = [];
 // answers[id] => boolean
 const answers = {};
 
+// ---------- Core helpers ----------
 function getDisplayName() {
   const raw = (els.nameInput?.value ?? "").trim();
   return raw.length ? raw : "Anonymous";
@@ -44,7 +47,9 @@ function getDisplayName() {
 
 function setResultTitle() {
   const nm = getDisplayName();
-  els.resultTitle.textContent = nm === "Anonymous" ? "Results" : `Results for ${nm}`;
+  if (els.resultTitle) {
+    els.resultTitle.textContent = nm === "Anonymous" ? "Results" : `Results for ${nm}`;
+  }
 }
 
 function scoreStyle(styleKey) {
@@ -63,17 +68,18 @@ function computeScores() {
 
   const ticked = Object.values(answers).filter(Boolean).length;
 
-  els.sActivist.textContent = activist;
-  els.sReflector.textContent = reflector;
-  els.sTheorist.textContent = theorist;
-  els.sPragmatist.textContent = pragmatist;
-  els.sTicked.textContent = ticked;
-  els.sTotal.textContent = QUESTIONS.length || 80;
+  if (els.sActivist) els.sActivist.textContent = activist;
+  if (els.sReflector) els.sReflector.textContent = reflector;
+  if (els.sTheorist) els.sTheorist.textContent = theorist;
+  if (els.sPragmatist) els.sPragmatist.textContent = pragmatist;
+  if (els.sTicked) els.sTicked.textContent = ticked;
+  if (els.sTotal) els.sTotal.textContent = QUESTIONS.length || 80;
 
   setResultTitle();
-  drawCross({ activist, reflector, theorist, pragmatist });
+  if (els.cross) drawCross({ activist, reflector, theorist, pragmatist });
 }
 
+// ---------- Rendering ----------
 function makeQuestionRow(q) {
   const row = document.createElement("label");
   row.className = "q";
@@ -127,12 +133,14 @@ async function loadQuestions() {
 }
 
 function renderQuestions() {
+  if (!els.qList) return;
   els.qList.innerHTML = "";
   const frag = document.createDocumentFragment();
   for (const q of QUESTIONS) frag.appendChild(makeQuestionRow(q));
   els.qList.appendChild(frag);
 }
 
+// ---------- Persistence ----------
 function persistAnswers() {
   try {
     localStorage.setItem(STORAGE_ANSWERS, JSON.stringify(answers));
@@ -155,7 +163,7 @@ function restoreAnswers() {
 
 function persistName() {
   try {
-    localStorage.setItem(STORAGE_NAME, (els.nameInput.value ?? "").trim());
+    localStorage.setItem(STORAGE_NAME, (els.nameInput?.value ?? "").trim());
   } catch (_) {}
 }
 
@@ -166,6 +174,7 @@ function restoreName() {
   } catch (_) {}
 }
 
+// ---------- Bulk actions ----------
 function setAll(val) {
   for (const q of QUESTIONS) answers[q.id] = val;
   persistAnswers();
@@ -180,7 +189,7 @@ function randomDemo() {
   computeScores();
 }
 
-// --- SVG cross drawing (labels never clipped) ---
+// ---------- SVG cross drawing (labels never clipped) ----------
 function drawCross({ activist, reflector, theorist, pragmatist }) {
   const svg = els.cross;
   while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -207,7 +216,6 @@ function drawCross({ activist, reflector, theorist, pragmatist }) {
   // Labels + scores (anchors point inward so text never crosses SVG bounds)
   svg.appendChild(labelBlock(cx, m + 10, "Activist", activist, "middle"));
   svg.appendChild(labelBlock(cx, H - (m + 32), "Theorist", theorist, "middle"));
-
   svg.appendChild(labelBlock(m, cy, "Reflector", reflector, "start"));
   svg.appendChild(labelBlock(W - m, cy, "Pragmatist", pragmatist, "end"));
 
@@ -228,7 +236,7 @@ function drawCross({ activist, reflector, theorist, pragmatist }) {
   }
 }
 
-// --- SVG helpers ---
+// ---------- SVG helpers ----------
 function svgEl(name, attrs = {}) {
   const el = document.createElementNS("http://www.w3.org/2000/svg", name);
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
@@ -254,17 +262,17 @@ function labelBlock(x, y, label, value, anchor) {
   return g;
 }
 
-// --- Download outcome (PNG) ---
+// ---------- Download outcome (PNG) ----------
 async function downloadOutcomePng() {
   const name = getDisplayName();
   const dateStr = new Date().toLocaleString("en-GB");
 
-  const activist = Number(els.sActivist.textContent) || 0;
-  const reflector = Number(els.sReflector.textContent) || 0;
-  const theorist = Number(els.sTheorist.textContent) || 0;
-  const pragmatist = Number(els.sPragmatist.textContent) || 0;
+  const activist = Number(els.sActivist?.textContent) || 0;
+  const reflector = Number(els.sReflector?.textContent) || 0;
+  const theorist = Number(els.sTheorist?.textContent) || 0;
+  const pragmatist = Number(els.sPragmatist?.textContent) || 0;
 
-  els.downloadStatus.textContent = "Preparing download…";
+  if (els.downloadStatus) els.downloadStatus.textContent = "Preparing download…";
 
   const svgDataUrl = svgToDataUrl(els.cross);
   const crossImg = await loadImage(svgDataUrl);
@@ -330,7 +338,7 @@ async function downloadOutcomePng() {
   ctx.fillStyle = "#6b7280";
   ctx.font = "400 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
   ctx.fillText("Honey & Mumford Questions are copyrighted by Honey & Mumford.", 40, H - 40);
-  ctx.fillText("Code copyrighted by Dr Somdip Dey, Regent European University.", 40, H - 22);
+  ctx.fillText("Code copyrighted by Dr Somdip Dey, Regent European University / Regent College London / Regent Global.", 40, H - 22);
 
   const safeName = name.replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "_") || "Anonymous";
   const filename = `Learning_Styles_Outcome_${safeName}.png`;
@@ -347,7 +355,7 @@ async function downloadOutcomePng() {
   a.remove();
   URL.revokeObjectURL(url);
 
-  els.downloadStatus.textContent = `Downloaded: ${filename}`;
+  if (els.downloadStatus) els.downloadStatus.textContent = `Downloaded: ${filename}`;
 }
 
 function svgToDataUrl(svgElement) {
@@ -367,15 +375,96 @@ function loadImage(src) {
   });
 }
 
-// --- Init ---
+// ---------- Copilot integration ----------
+function buildCopilotPrompt() {
+  const name = getDisplayName();
+
+  const activist = Number(els.sActivist?.textContent) || 0;
+  const reflector = Number(els.sReflector?.textContent) || 0;
+  const theorist = Number(els.sTheorist?.textContent) || 0;
+  const pragmatist = Number(els.sPragmatist?.textContent) || 0;
+
+  const ticked = Number(els.sTicked?.textContent) || 0;
+  const total = Number(els.sTotal?.textContent) || 80;
+
+  return [
+    "You are an educational coach. Interpret my Honey & Mumford Learning Styles Questionnaire results and provide practical study strategies.",
+    "",
+    `Name: ${name}`,
+    "Scores (out of 20 each):",
+    `- Activist: ${activist}`,
+    `- Reflector: ${reflector}`,
+    `- Theorist: ${theorist}`,
+    `- Pragmatist: ${pragmatist}`,
+    "",
+    `Items ticked: ${ticked} / ${total}`,
+    "",
+    "Please do the following:",
+    "1) Identify my dominant style(s) and what that suggests about how I learn best.",
+    "2) Give 6–10 concrete study strategies tailored to my profile (e.g., lecture prep, note-taking, revision, assignments).",
+    "3) Give 2–3 potential blind spots and how to compensate for them.",
+    "4) Suggest how I can adapt when taught in a style that doesn't match my preference.",
+  ].join("\n");
+}
+
+async function analyseWithCopilot() {
+  // Ensure DOM reflects latest checkboxes before building prompt
+  computeScores();
+  const prompt = buildCopilotPrompt();
+
+  if (els.copilotStatus) els.copilotStatus.textContent = "";
+
+  // Copy prompt to clipboard (works on HTTPS; GitHub Pages is HTTPS)
+  let copied = false;
+  try {
+    await navigator.clipboard.writeText(prompt);
+    copied = true;
+  } catch (_) {
+    // Fallback for older browsers / permission issues
+    const ta = document.createElement("textarea");
+    ta.value = prompt;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "absolute";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      copied = document.execCommand("copy");
+    } catch (_) {
+      copied = false;
+    }
+    ta.remove();
+  }
+
+  // Open Copilot
+  window.open("https://copilot.microsoft.com/", "_blank", "noopener,noreferrer");
+
+  if (els.copilotStatus) {
+    els.copilotStatus.textContent = copied
+      ? "Copied a Copilot prompt (including your scores) to clipboard. Copilot opened in a new tab — paste (Ctrl/Cmd+V) to analyse."
+      : "Copilot opened in a new tab. Clipboard copy was blocked by your browser — please copy your scores manually or try again.";
+  }
+}
+
+// ---------- Init ----------
 (async function init() {
   restoreAnswers();
   restoreName();
   setResultTitle();
 
-  els.nameInput.addEventListener("input", () => {
+  els.nameInput?.addEventListener("input", () => {
     persistName();
     setResultTitle();
+  });
+
+  els.btnCopilot?.addEventListener("click", async () => {
+    try {
+      await analyseWithCopilot();
+    } catch (e) {
+      if (els.copilotStatus) {
+        els.copilotStatus.textContent = `Could not open Copilot / copy prompt: ${e?.message ?? "Unknown error"}`;
+      }
+    }
   });
 
   try {
@@ -383,23 +472,25 @@ function loadImage(src) {
     renderQuestions();
     computeScores();
   } catch (err) {
-    els.qList.innerHTML = `<div class="loading">Error: ${escapeHtml(err.message)}</div>`;
+    if (els.qList) {
+      els.qList.innerHTML = `<div class="loading">Error: ${escapeHtml(err.message)}</div>`;
+    }
   }
 
-  els.btnCheckAll.addEventListener("click", () => setAll(true));
-  els.btnUncheckAll.addEventListener("click", () => setAll(false));
-  els.btnRandom.addEventListener("click", () => randomDemo());
+  els.btnCheckAll?.addEventListener("click", () => setAll(true));
+  els.btnUncheckAll?.addEventListener("click", () => setAll(false));
+  els.btnRandom?.addEventListener("click", () => randomDemo());
 
   els.btnToResults?.addEventListener("click", () => {
     document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  els.btnDownload.addEventListener("click", async () => {
-    els.downloadStatus.textContent = "";
+  els.btnDownload?.addEventListener("click", async () => {
+    if (els.downloadStatus) els.downloadStatus.textContent = "";
     try {
       await downloadOutcomePng();
     } catch (e) {
-      els.downloadStatus.textContent = `Download failed: ${e?.message ?? "Unknown error"}`;
+      if (els.downloadStatus) els.downloadStatus.textContent = `Download failed: ${e?.message ?? "Unknown error"}`;
     }
   });
 })();

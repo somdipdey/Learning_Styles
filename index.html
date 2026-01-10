@@ -68,8 +68,26 @@
             <h2>Results</h2>
             <p class="subtle small" id="result-title">Results</p>
           </div>
+
           <div class="results-actions">
             <button id="btn-download" type="button">Download outcome (PNG)</button>
+
+            <!-- NEW: Copilot analysis action -->
+            <div class="copilot-actions">
+              <button id="btn-copilot" type="button" class="primary">
+                Analyse Results with Copilot
+              </button>
+
+              <button
+                id="btn-copilot-info"
+                type="button"
+                class="icon-btn"
+                aria-label="What does Analyse Results with Copilot do?"
+                title="Opens Microsoft Copilot in a new tab and copies a ready-made prompt (including your scores) to your clipboard. You then paste it into Copilot to get an interpretation and study tips."
+              >
+                i
+              </button>
+            </div>
           </div>
         </div>
 
@@ -86,6 +104,9 @@
         </div>
 
         <p class="subtle small" id="download-status" aria-live="polite"></p>
+
+        <!-- NEW: status message for Copilot action -->
+        <p class="subtle small" id="copilot-status" aria-live="polite"></p>
       </div>
 
       <div class="card" id="cross-card">
