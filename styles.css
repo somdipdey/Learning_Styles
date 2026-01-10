@@ -266,3 +266,56 @@ button.primary {
 .icon-btn:hover {
   border-color: rgba(122,162,255,0.6);
 }
+
+/* --- Info popover (works on hover + click, desktop + mobile) --- */
+.info-popover {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.popover {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  width: 320px;
+  max-width: 70vw;
+  background: #0f1118;
+  border: 1px solid rgba(122,162,255,0.45);
+  border-radius: 12px;
+  padding: 12px 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  color: var(--text);
+  z-index: 50;
+  display: none;
+}
+
+.popover strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.popover p {
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.popover em { color: var(--accent); font-style: normal; }
+
+.popover.show { display: block; }
+
+/* Slight arrow */
+.popover::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 10px;
+  width: 14px;
+  height: 14px;
+  background: #0f1118;
+  border-left: 1px solid rgba(122,162,255,0.45);
+  border-top: 1px solid rgba(122,162,255,0.45);
+  transform: rotate(45deg);
+}

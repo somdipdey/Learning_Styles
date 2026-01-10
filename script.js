@@ -33,6 +33,8 @@ const els = {
   downloadStatus: document.getElementById("download-status"),
   btnCopilot: document.getElementById("btn-copilot"),
   copilotStatus: document.getElementById("copilot-status"),
+  btnCopilotInfo: document.getElementById("btn-copilot-info"),
+  copilotPopover: document.getElementById("copilot-popover"),
 };
 
 let QUESTIONS = [];
@@ -262,6 +264,29 @@ function labelBlock(x, y, label, value, anchor) {
   return g;
 }
 
+// ---------- Info button helpers ----------
+function showPopover() {
+  if (!els.copilotPopover || !els.btnCopilotInfo) return;
+  els.copilotPopover.classList.add("show");
+  els.copilotPopover.setAttribute("aria-hidden", "false");
+  els.btnCopilotInfo.setAttribute("aria-expanded", "true");
+}
+
+function hidePopover() {
+  if (!els.copilotPopover || !els.btnCopilotInfo) return;
+  els.copilotPopover.classList.remove("show");
+  els.copilotPopover.setAttribute("aria-hidden", "true");
+  els.btnCopilotInfo.setAttribute("aria-expanded", "false");
+}
+
+function togglePopover() {
+  if (!els.copilotPopover) return;
+  const open = els.copilotPopover.classList.contains("show");
+  if (open) hidePopover();
+  else showPopover();
+}
+
+
 // ---------- Download outcome (PNG) ----------
 async function downloadOutcomePng() {
   const name = getDisplayName();
@@ -466,6 +491,25 @@ async function analyseWithCopilot() {
       }
     }
   });
+
+  // --- Copilot info popover: show on hover + click, hide on outside click / Escape ---
+  els.btnCopilotInfo?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    togglePopover();
+  });
+
+  els.btnCopilotInfo?.addEventListener("mouseenter", () => showPopover());
+  els.btnCopilotInfo?.addEventListener("mouseleave", () => hidePopover());
+
+  // Clicking anywhere else closes it
+  document.addEventListener("click", () => hidePopover());
+
+  // ESC closes it
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") hidePopover();
+  });
+
 
   try {
     await loadQuestions();
