@@ -413,7 +413,9 @@ function buildCopilotPrompt() {
   const total = Number(els.sTotal?.textContent) || 80;
 
   return [
-    "You are an educational coach. Interpret my Honey & Mumford Learning Styles Questionnaire results and provide practical study strategies.",
+    "You are an educational coach. Use my Honey & Mumford questionnaire scores as a reflection tool, not a fixed label.",
+    "Important: Do not assume I learn best only in one style and do not recommend matching teaching to a style.",
+    "Instead, help me build a balanced set of study strategies grounded in evidence-based learning principles (e.g., retrieval practice, spacing, interleaving, elaboration, worked examples, practice with feedback).",
     "",
     `Name: ${name}`,
     "Scores (out of 20 each):",
@@ -425,12 +427,14 @@ function buildCopilotPrompt() {
     `Items ticked: ${ticked} / ${total}`,
     "",
     "Please do the following:",
-    "1) Identify my dominant style(s) and what that suggests about how I learn best.",
-    "2) Give 6–10 concrete study strategies tailored to my profile (e.g., lecture prep, note-taking, revision, assignments).",
-    "3) Give 2–3 potential blind spots and how to compensate for them.",
-    "4) Suggest how I can adapt when taught in a style that doesn't match my preference.",
+    "1) Summarise what these scores might suggest about preferences (use probabilistic language), and note that people can be a mix and can develop across styles.",
+    "2) Give 8–12 concrete, course-ready study strategies mapped to (a) my stronger tendencies and (b) the styles I scored lower on so I can strengthen them.",
+    "3) Provide a 2-week experiment plan (what to try on which days), including how to measure what’s working.",
+    "4) Identify 2–3 potential blind spots and how to compensate.",
+    "5) Suggest how to adapt in teaching sessions that don’t align with my preferences (e.g., what I should do before/during/after class).",
   ].join("\n");
 }
+
 
 async function analyseWithCopilot() {
   // Ensure DOM reflects latest checkboxes before building prompt
